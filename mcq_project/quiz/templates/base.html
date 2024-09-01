@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz Application{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #004080; /* Navy Blue */
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .content {
+            margin-bottom: 50px; /* To ensure footer does not overlap content */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'quiz' %}">Home</a>
+        <a href="{% url 'score_list' %}">Scores</a>
+        <!-- Add more navigation links as needed -->
+    </div>
+
+    <div class="container content">
+        {% block content %}
+        <!-- Content from other templates will be inserted here -->
+        {% endblock %}
+    </div>
+
+    <div class="footer">
+        &copy; 2024 @imvickykumar999
+    </div>
+</body>
+</html>

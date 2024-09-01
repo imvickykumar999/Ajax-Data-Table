@@ -1,2 +1,9 @@
-<h2>Your Score</h2>
-<p>You scored {{ score }} out of {{ total }}</p>
+{% extends 'base.html' %}
+
+{% block title %}Quiz{% endblock %}
+
+{% block content %}
+    <h2>Your Score</h2>
+    <p>You scored {{ score }} out of {{ total }}</p>
+{% endblock %}
+

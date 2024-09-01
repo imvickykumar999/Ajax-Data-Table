@@ -1,9 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz{% endblock %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Scores</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
@@ -17,6 +21,24 @@
                 <th>Identifier</th>
                 <th>Score</th>
                 <th>Date Taken</th>
+                <th>Actions</th> <!-- Column for the "View" button -->
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>Question Details</h2>
+    <table id="questionDetails" class="display" style="display:none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Question Text</th>
+                <th>Option A</th>
+                <th>Option B</th>
+                <th>Option C</th>
+                <th>Option D</th>
+                <th>Correct Option</th>
             </tr>
         </thead>
         <tbody>
@@ -25,19 +47,56 @@
 
     <script>
         $(document).ready(function() {
-            $('#scoreTable').DataTable({
+            var scoreTable = $('#scoreTable').DataTable({
                 "ajax": {
-                    "url": "{% url 'score_data' %}",  // Make sure this is correct
+                    "url": "{% url 'score_data' %}",
                     "dataSrc": ""
                 },
                 "columns": [
                     { "data": "id" },
                     { "data": "identifier" },
                     { "data": "score" },
-                    { "data": "date_taken" }
+                    { "data": "date_taken" },
+                    {
+                        "data": null,
+                        "defaultContent": '<button class="view-btn">View</button>'
+                    }
                 ]
+            });
+
+            $('#scoreTable tbody').on('click', '.view-btn', function () {
+                var data = scoreTable.row($(this).parents('tr')).data();
+                var scoreId = data.id;
+                
+                // Fetch question details based on score ID
+                $.ajax({
+                    url: '/question/' + scoreId + '/',
+                    method: 'GET',
+                    success: function(response) {
+                        // Populate question details table
+                        $('#questionDetails').show();
+                        var questionTable = $('#questionDetails').DataTable({
+                            "destroy": true,  // Destroy previous instance if exists
+                            "data": [response],
+                            "columns": [
+                                { "data": "id" },
+                                { "data": "question_text" },
+                                { "data": "options.a" },
+                                { "data": "options.b" },
+                                { "data": "options.c" },
+                                { "data": "options.d" },
+                                { "data": "correct_option" }
+                            ]
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('AJAX error: ' + textStatus + ': ' + errorThrown);
+                        alert('Could not fetch question details.');
+                    }
+                });
             });
         });
     </script>
 </body>
 </html>
+{% endblock %}

@@ -1,7 +1,8 @@
 from django import forms
-from .models import Question
 
 class QuizForm(forms.Form):
+    identifier = forms.CharField(required=False, label='Your Name (optional)')
+    
     def __init__(self, *args, **kwargs):
         questions = kwargs.pop('questions')
         super(QuizForm, self).__init__(*args, **kwargs)

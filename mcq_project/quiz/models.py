@@ -16,3 +16,11 @@ class Solution(models.Model):
 
     def __str__(self):
         return f"Options for: {self.question.question_text}"
+
+class Score(models.Model):
+    identifier = models.CharField(max_length=255, blank=True, null=True)  # Optional field to identify the user
+    score = models.IntegerField()
+    date_taken = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Score: {self.score} on {self.date_taken}"

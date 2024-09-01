@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Scores</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+</head>
+<body>
+    <h2>All Submitted Scores</h2>
+    <table id="scoreTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Identifier</th>
+                <th>Score</th>
+                <th>Date Taken</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            $('#scoreTable').DataTable({
+                "ajax": {
+                    "url": "{% url 'score_data' %}",  // Make sure this is correct
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "id" },
+                    { "data": "identifier" },
+                    { "data": "score" },
+                    { "data": "date_taken" }
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

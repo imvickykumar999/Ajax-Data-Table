@@ -28,8 +28,8 @@
         </tbody>
     </table>
 
-    <h2>Question Details</h2>
-    <table id="questionDetails" class="display" style="display:none;">
+    <h2>Answer Details</h2>
+    <table id="answerDetails" class="display" style="display:none;">
         <thead>
             <tr>
                 <th>ID</th>
@@ -38,6 +38,7 @@
                 <th>Option B</th>
                 <th>Option C</th>
                 <th>Option D</th>
+                <th>Selected Option</th>
                 <th>Correct Option</th>
             </tr>
         </thead>
@@ -68,16 +69,16 @@
                 var data = scoreTable.row($(this).parents('tr')).data();
                 var scoreId = data.id;
                 
-                // Fetch question details based on score ID
+                // Fetch answer details based on score ID
                 $.ajax({
-                    url: '/question/' + scoreId + '/',
+                    url: '/answers/' + scoreId + '/',
                     method: 'GET',
                     success: function(response) {
-                        // Populate question details table
-                        $('#questionDetails').show();
-                        var questionTable = $('#questionDetails').DataTable({
+                        // Populate answer details table
+                        $('#answerDetails').show();
+                        var answerTable = $('#answerDetails').DataTable({
                             "destroy": true,  // Destroy previous instance if exists
-                            "data": [response],
+                            "data": response,
                             "columns": [
                                 { "data": "id" },
                                 { "data": "question_text" },
@@ -85,17 +86,19 @@
                                 { "data": "option_b" },
                                 { "data": "option_c" },
                                 { "data": "option_d" },
+                                { "data": "selected_option" },
                                 { "data": "correct_option" }
                             ]
                         });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.log('AJAX error: ' + textStatus + ': ' + errorThrown);
-                        alert('Could not fetch question details.');
+                        alert('Could not fetch answer details.');
                     }
                 });
             });
         });
+
     </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Solution, Score
+from .models import Question, Solution, Score, Answer
 
 class SolutionInline(admin.StackedInline):
     model = Solution
@@ -21,3 +21,9 @@ class ScoreAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'score', 'date_taken')  # Customize to match your fields
     search_fields = ('identifier',)  # Add search fields if necessary
     list_filter = ('date_taken',)  # Add filters if necessary
+
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('score', 'question', 'selected_option')  # Customize to match your fields
+    search_fields = ('score__identifier', 'question__question_text', 'selected_option')  # Add search fields if necessary
+    list_filter = ('score', 'question')  # Add filters if necessary

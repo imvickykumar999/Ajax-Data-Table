@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Score{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .dataTables_wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table.dataTable {
+            width: 100%;
+            margin: 0 auto;
+        }
+        table thead th {
+            white-space: nowrap;
+        }
+        @media screen and (max-width: 600px) {
+            h2 {
+                font-size: 18px;
+            }
+            table {
+                font-size: 12px;
+            }
+            .view-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>All Submitted Scores</h2>
+    <div class="dataTables_wrapper">
+        <table id="scoreTable" class="display">
+            <thead>
+                <tr>
+                    <th>Date Taken</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                    <th>Actions</th> <!-- Column for the "View" button -->
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Answer Details</h2>
+    <div class="dataTables_wrapper">
+        <table id="answerDetails" class="display" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Selected Option</th>
+                    <th>Question Text</th>
+                    <th>Option A</th>
+                    <th>Option B</th>
+                    <th>Option C</th>
+                    <th>Option D</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var scoreTable = $('#scoreTable').DataTable({
+                "ajax": {
+                    "url": "{% url 'score_data' %}",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    {
+                        "data": "date_taken",
+                        "render": function(data, type, row) {
+                            var date = new Date(data);
+                            var options = {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            };
+                            return date.toLocaleDateString('en-US', options);
+                        }
+                    },
+                    { "data": "identifier" },
+                    { "data": "score" },
+                    {
+                        "data": null,
+                        "defaultContent": '<button class="view-btn">View</button>'
+                    }
+                ]
+            });
+
+            $('#scoreTable tbody').on('click', '.view-btn', function () {
+                var data = scoreTable.row($(this).parents('tr')).data();
+                var scoreId = data.id;
+
+                // Fetch answer details based on score ID
+                $.ajax({
+                    url: '/answers/' + scoreId + '/',
+                    method: 'GET',
+                    success: function(response) {
+                        // Populate answer details table
+                        $('#answerDetails').show();
+                        var answerTable = $('#answerDetails').DataTable({
+                            "destroy": true,  // Destroy previous instance if exists
+                            "data": response,
+                            "columns": [
+                                {
+                                    "data": "selected_option",
+                                    "render": function(data, type, row) {
+                                        if (data === row.correct_option) {
+                                            return '<span style="color: green;">' + data + '</span>';
+                                        } else {
+                                            return '<span style="color: red;">' + data + '</span>';
+                                        }
+                                    }
+                                },
+                                { "data": "question_text" },
+                                { "data": "option_a" },
+                                { "data": "option_b" },
+                                { "data": "option_c" },
+                                { "data": "option_d" },
+                            ]
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('AJAX error: ' + textStatus + ': ' + errorThrown);
+                        alert('Could not fetch answer details.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

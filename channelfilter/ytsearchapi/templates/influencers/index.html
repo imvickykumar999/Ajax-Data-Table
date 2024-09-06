@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube Influencer Search{% endblock %}
+
+{% block content %}
+    <h1>YouTube Influencer Search</h1>
+
+    <form method="GET" action="{% url 'yt_result' %}" class="influencer-search-form">
+        <div class="form-group">
+            <label for="search_query">Search Query:</label>
+            <input type="text" name="search_query" id="search_query" required>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location (latitude, longitude):</label>
+            <input type="text" name="location" id="location" value="28.7041,77.1025">
+        </div>
+
+        <div class="form-group">
+            <label for="location_radius">Location Radius:</label>
+            <input type="text" name="location_radius" id="location_radius" value="500km">
+        </div>
+
+        <div class="form-group">
+            <label for="country">Country:</label>
+            <input type="text" name="country" id="country" value="India">
+        </div>
+
+        <div class="form-group">
+            <label for="state">State:</label>
+            <input type="text" name="state" id="state" value="Delhi">
+        </div>
+
+        <div class="form-group">
+            <label for="min_subscribers">Minimum Subscribers:</label>
+            <input type="number" name="min_subscribers" id="min_subscribers" value="10000">
+        </div>
+
+        <div class="form-group">
+            <label for="max_results">Max Results:</label>
+            <input type="number" name="max_results" id="max_results" value="50">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+{% endblock %}

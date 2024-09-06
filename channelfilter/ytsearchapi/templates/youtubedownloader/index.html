@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube Video Downloader{% endblock %}
+
+{% block content %}
+    <h1>YouTube Video Downloader</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="url">Enter YouTube Video URL:</label>
+            <input type="text" class="form-control" name="url" id="url" required placeholder="https://www.youtube.com/watch?v=example">
+        </div>
+        <button type="submit" class="btn btn-primary">Get Video Formats</button>
+    </form>
+{% endblock %}

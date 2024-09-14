@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube API Search Results{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube API Results</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS/JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap CSS/JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn-view {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background-color: #0056b3;
+        }
+
+        /* Make table horizontally scrollable */
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            table, th, td {
+                white-space: nowrap;
+            }
+
+            .dataTables_wrapper {
+                overflow-x: scroll;
+            }
+
+            h1 {
+                font-size: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ search_topic }}</h1>
+
+    <table id="youtube-api-results-table" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>View Details</th>
+                <th>Language</th>
+                <th>Subscribers</th>
+                <th>Location</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here by JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Modal for showing additional details -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">YouTube Channel Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="modal-name"></span></p>
+                    <p><strong>Language:</strong> <span id="modal-language"></span></p>
+                    <p><strong>Subscribers:</strong> <span id="modal-subscribers"></span></p>
+                    <p><strong>Description:</strong> <span id="modal-description"></span></p>
+                    <p><strong>Location:</strong> <span id="modal-location"></span></p>
+                    <p><strong>Created at:</strong> <span id="modal-date"></span></p>
+                    
+                    <div style="text-align: right;">
+                        <a href="#" id="modal-link" class="btn btn-primary" target="_blank">View Channel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let searchId = "{{ search_query_id }}"; // Pass the search_id dynamically
+
+            // Initialize DataTables with horizontal scrolling enabled
+            let table = $('#youtube-api-results-table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "scrollX": true,  // Enable horizontal scrolling
+                "ajax": {
+                    "url": `/search_queries/${searchId}/`,  // API endpoint for your model data
+                },
+                "columns": [
+                    { "data": "name" },
+                    {
+                        "data": "link",
+                        "render": function(data, type, row) {
+                            return '<a href="#">View Details</a>';
+                        }
+                    },
+                    { "data": "language" },
+                    { "data": "subscribers" },
+                    { "data": "location" },
+                    { "data": "created_at" }
+                ],
+                "order": [[ 5, "desc" ]]  // Default order by created_at column (date)
+            });
+
+            // Handle row click to show details in modal
+            $('#youtube-api-results-table tbody').on('click', 'tr', function() {
+                let data = table.row(this).data(); // Get row data
+
+                // Populate modal with row details
+                $('#modal-name').text(data.name);
+                $('#modal-language').text(data.language);
+                $('#modal-subscribers').text(data.subscribers);
+                $('#modal-description').text(data.description);
+                $('#modal-location').text(data.location);
+                $('#modal-date').text(new Date(data.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+                }));
+                $('#modal-link').attr('href', data.link);
+
+                // Show the modal
+                $('#detailsModal').modal('show');
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

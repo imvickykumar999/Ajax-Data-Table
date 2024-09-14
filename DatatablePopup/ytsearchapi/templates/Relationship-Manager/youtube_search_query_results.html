@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube API Search Results{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube API Search Results</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .date-filter {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-left: 10px;
+        }
+
+        /* Make only the datatable horizontally scrollable */
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube API Search Results</h1>
+
+    <div class="date-filter">
+        <label for="startdate">Start Date:</label>
+        <input type="text" id="startdate" name="startdate">
+
+        <label for="enddate">End Date:</label>
+        <input type="text" id="enddate" name="enddate">
+
+        <button id="filter-date">Filter</button>
+        <button id="reset-date">Reset</button>
+    </div>
+
+    <table id="search-results-table" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Search Query</th>
+                <th>Location</th>
+                <th>Location Radius</th>
+                <th>Country</th>
+                <th>State</th>
+                <th>Min Subscribers</th>
+                <th>Max Results</th>
+                <th>Date</th>
+                <th>View Results</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize datepickers
+            $("#startdate").datepicker({ dateFormat: 'yy-mm-dd' });
+            $("#enddate").datepicker({ dateFormat: 'yy-mm-dd' });
+
+            // Initialize DataTables with horizontal scrolling enabled
+            let table = $('#search-results-table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "scrollX": true,  // Enable horizontal scrolling
+                "ajax": {
+                    "url": "/search_list/", // Replace with your actual API endpoint
+                    "data": function (d) {
+                        d.startdate = $('#startdate').val();
+                        d.enddate = $('#enddate').val();
+                    }
+                },
+                "columns": [
+                    { "data": "search_query" },
+                    { "data": "location" },
+                    { "data": "location_radius" },
+                    { "data": "country" },
+                    { "data": "state" },
+                    { "data": "min_subscribers" },
+                    { "data": "max_results" },
+                    { "data": "created_at" },
+                    {
+                        "data": "id",  // Use the 'id' for dynamic links
+                        "render": function(data, type, row) {
+                            return '<a target="_blank" href="/search_query_results/' + data + '">View Results</a>';
+                        }
+                    }
+                ],
+                "order": [[ 7, "desc" ]]  // Default order by created_at column (date)
+            });
+
+            // Event listener for date filter
+            $('#filter-date').click(function() {
+                table.draw();
+            });
+
+            // Event listener for reset button
+            $('#reset-date').click(function() {
+                // Clear the date inputs
+                $('#startdate').val('');
+                $('#enddate').val('');
+
+                // Reload the table with no date filtering
+                table.draw();
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

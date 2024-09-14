@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Formats for Download{% endblock %}
+
+{% block content %}
+    <h1>Available Formats for Download</h1>
+
+    <!-- Display the video thumbnail -->
+    <div class="video-thumbnail">
+        <img src="{{ thumbnail_url }}" alt="Thumbnail" class="img-thumbnail">
+    </div>
+
+    <!-- Download formats form -->
+    <form method="POST" action="{% url 'download_selected_view' %}" class="download-form">
+        {% csrf_token %}
+        
+        <!-- Hidden field to store the original video URL -->
+        <input type="hidden" name="url" value="{{ url }}">
+
+        <!-- Format selection dropdown -->
+        <div class="form-group">
+            <label for="format_url">Select Download Format:</label>
+            <select name="format_url" id="format_url" class="form-control">
+                {% for format in formats %}
+                    <option value="{{ format.url }}">{{ format.description }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Download button -->
+        <button type="submit" class="btn btn-primary">Download</button>
+    </form>
+{% endblock %}

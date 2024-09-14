@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube Influencer Search Results{% endblock %}
+
+{% block content %}
+    <h1>YouTube Influencer Search Results</h1>
+
+    {% if channels %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subscribers</th>
+                    <th>Description</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel in channels %}
+                    <tr>
+                        <td>{{ channel.name }}</td>
+                        <td>{{ channel.subscribers }}</td>
+                        <td>{{ channel.description }}</td>
+                        <td><a href="{{ channel.link }}" target="_blank">View Channel</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+{% endblock %}

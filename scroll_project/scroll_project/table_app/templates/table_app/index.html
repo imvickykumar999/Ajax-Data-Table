@@ -3,26 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Load Rows on Scroll</title>
+    <title>Load Rows on Scroll with Filters</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #4CAF50;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .filter-container label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .filter-container select, .filter-container button {
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
         table {
-            width: 100%;
+            width: 90%;
+            margin: 20px auto;
             border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
         }
         #loading {
             text-align: center;
             margin-top: 20px;
+            font-size: 16px;
+            color: #555;
             display: none;
         }
     </style>
 </head>
 <body>
     <h1>Load Rows on Scroll</h1>
+    <div class="filter-container">
+        <label for="filter">Filter by Name:</label>
+        <select id="filter">
+            <option value="">-- Select --</option>
+
+            {% for i in range100 %}
+                <option value="Row {{i}}">Row {{i}}</option>
+            {% endfor %}
+            
+        </select>
+        <button id="clear-filter">Clear Filter</button>
+    </div>
     <table id="data-table">
         <thead>
             <tr>
@@ -39,15 +95,17 @@
     <script>
         let currentPage = 1;
         let hasNext = true;
+        let currentFilter = "";
 
         const loadRows = () => {
             if (!hasNext) return;
             document.getElementById('loading').style.display = 'block';
             
-            fetch(`api/load-rows/?page=${currentPage}`)
+            fetch(`api/load-rows/?page=${currentPage}&filter=${currentFilter}`)
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector('#data-table tbody');
+                    if (currentPage === 1) tableBody.innerHTML = ""; // Clear table on new filter
                     data.rows.forEach(row => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `<td>${row.id}</td><td>${row.name}</td><td>${row.details}</td>`;
@@ -67,6 +125,23 @@
             }
         };
 
+        const applyFilter = () => {
+            currentFilter = document.getElementById('filter').value;
+            currentPage = 1;
+            hasNext = true;
+            loadRows();
+        };
+
+        const clearFilter = () => {
+            document.getElementById('filter').value = "";
+            currentFilter = "";
+            currentPage = 1;
+            hasNext = true;
+            loadRows();
+        };
+
+        document.getElementById('filter').addEventListener('change', applyFilter);
+        document.getElementById('clear-filter').addEventListener('click', clearFilter);
         window.addEventListener('scroll', handleScroll);
 
         // Initial load

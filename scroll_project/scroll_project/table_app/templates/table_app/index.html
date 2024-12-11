@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Rows on Scroll</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Load Rows on Scroll</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div id="loading">Loading...</div>
+
+    <script>
+        let currentPage = 1;
+        let hasNext = true;
+
+        const loadRows = () => {
+            if (!hasNext) return;
+            document.getElementById('loading').style.display = 'block';
+            
+            fetch(`api/load-rows/?page=${currentPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#data-table tbody');
+                    data.rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${row.id}</td><td>${row.name}</td><td>${row.details}</td>`;
+                        tableBody.appendChild(tr);
+                    });
+                    hasNext = data.has_next;
+                    currentPage++;
+                    document.getElementById('loading').style.display = 'none';
+                })
+                .catch(error => console.error('Error loading rows:', error));
+        };
+
+        const handleScroll = () => {
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 5) {
+                loadRows();
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        // Initial load
+        loadRows();
+    </script>
+</body>
+</html>

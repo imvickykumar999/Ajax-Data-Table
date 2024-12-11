@@ -66,7 +66,8 @@
     </style>
 </head>
 <body>
-    <h1>Load Rows on Scroll</h1>
+    <h1 id="page-title">Load Rows on Scroll</h1>
+
     <div class="filter-container">
         <label for="filter">Filter by Name:</label>
         <select id="filter">
@@ -97,6 +98,10 @@
         let hasNext = true;
         let currentFilter = "";
 
+        document.getElementById('page-title').addEventListener('click', () => {
+            window.open('https://secure-bluegill-purely.ngrok-free.app', '_blank');
+        });
+        
         const loadRows = () => {
             if (!hasNext) return;
             document.getElementById('loading').style.display = 'block';

@@ -6,11 +6,11 @@ from django.shortcuts import render
 def load_rows(request):
     page = request.GET.get('page', 1)
     filter_value = request.GET.get('filter', '')
-    rows_per_page = 20
+    rows_per_page = 30
 
     rows = TableRow.objects.all().order_by('id')
     if filter_value:
-        rows = rows.filter(name=filter_value)  # Adjust the field name accordingly
+        rows = rows.filter(name=filter_value) 
 
     paginator = Paginator(rows, rows_per_page)
     page_obj = paginator.get_page(page)
